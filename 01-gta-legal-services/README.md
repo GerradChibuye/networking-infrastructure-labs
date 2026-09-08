@@ -48,5 +48,10 @@ The objectives of this project are to:
 * PortFast
 * BPDU Guard
 * Cisco device hardening
+
+  2. Network Topology
+
+The following diagram represents the baseline unsecured network implemented in Cisco Packet Tracer.
+
 <img width="1370" height="399" alt="LAWFIRM_UNSECURE" src="https://github.com/user-attachments/assets/c649bf00-1f5a-4d24-914f-0b1e4ca4625b" />
 
