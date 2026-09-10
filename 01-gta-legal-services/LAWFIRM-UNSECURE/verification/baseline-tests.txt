@@ -1,1 +1,51 @@
+# LAWFIRM-UNSECURE — Baseline Verification
 
+## Purpose
+
+This file records the connectivity tests performed on the original LAWFIRM network before security controls were implemented.
+
+The purpose of the baseline was to determine whether the existing VLAN segmentation and inter-VLAN routing allowed communication between departmental networks.
+
+## Baseline Results
+
+| Source  | Destination   | Result |
+| ------- | ------------- | ------ |
+| ADMIN   | ADMIN Gateway | PASS   |
+| ADMIN   | LAWYERS       | PASS   |
+| ADMIN   | FINANCE       | PASS   |
+| ADMIN   | GUEST         | PASS   |
+| ADMIN   | SERVER        | PASS   |
+| LAWYERS | ADMIN         | PASS   |
+| FINANCE | ADMIN         | PASS   |
+| GUEST   | ADMIN         | PASS   |
+
+## Findings
+
+All tested communication paths were successful.
+
+The network had functioning:
+
+* VLAN segmentation
+* 802.1Q trunking
+* Router-on-a-Stick inter-VLAN routing
+* DHCP
+* Server connectivity
+
+However, the baseline also demonstrated a significant security weakness.
+
+VLANs separated broadcast domains but did not prevent Layer 3 communication between networks. Because no ACL restrictions had been implemented, hosts in different VLANs could communicate through the router.
+
+In particular:
+
+* GUEST could reach ADMIN.
+* FINANCE could reach ADMIN.
+* Departmental networks could communicate across VLAN boundaries.
+* There were no Layer 3 access-control restrictions enforcing the intended security policy.
+
+## Security Conclusion
+
+The baseline confirmed that the network was operational but insufficiently restricted.
+
+The next phase therefore introduced Layer 3 ACLs, Layer 2 Port Security, SSH management, management-plane restrictions, and unused-port hardening.
+
+The baseline results provide the comparison point for the secured LAWFIRM-SECURE network.
