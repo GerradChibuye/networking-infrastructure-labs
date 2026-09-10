@@ -53,7 +53,8 @@ The network uses a single Cisco router and switch.
 * `Fa0/24` connects the internal server.
 * Router-on-a-Stick is used for inter-VLAN routing.
 
-![LAWFIRM-SECURE Topology](topology/topology.png)
+<img width="1366" height="768" alt="lawfirm-secure" src="https://github.com/user-attachments/assets/2f4ac9fd-404f-4a59-b50e-024830ddea10" />
+
 
 ---
 
