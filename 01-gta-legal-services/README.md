@@ -159,7 +159,7 @@ For example:
 
 ```text
 ADMIN PC
-192.168.10.x
+192.168.10.x (DHCP)
      |
      | VLAN 10
      ↓
@@ -178,7 +178,7 @@ R1 G0/0.20
      | VLAN 20
      ↓
 LAWYER PC
-192.168.20.x
+192.168.20.(DHCP)
 ```
 
 At the unsecured baseline stage, inter-VLAN routing allows the different departmental networks to communicate according to the routing configuration.
@@ -199,4 +199,62 @@ At this stage of the project, the following functionality has been implemented a
 * Internal server connectivity
 
 No ACL-based traffic restrictions, SSH management controls, Layer 2 port-security controls, or additional device-hardening measures are considered part of this baseline configuration.
+
+## 5. Baseline Connectivity Testing
+
+### 5.1 Test Objective
+
+Connectivity testing was performed to establish the behaviour of the network before security controls were introduced.
+
+The objective was to verify that VLAN connectivity, inter-VLAN routing, DHCP and internal server communication were functioning correctly.
+
+### 5.2 Test Results
+
+The following connectivity tests were successfully completed:
+
+| Test                      | Result |
+| ------------------------- | ------ |
+| Admin PC → Admin gateway  | PASS   |
+| Admin PC → Lawyer PC      | PASS   |
+| Admin PC → Finance laptop | PASS   |
+| Admin PC → Guest laptop   | PASS   |
+| Admin PC → Server         | PASS   |
+| Lawyer PC → Admin PC      | PASS   |
+| Finance laptop → Admin PC | PASS   |
+| Guest laptop → Admin PC   | PASS   |
+
+### 5.3 Baseline Findings
+
+The tests confirmed that the four VLANs were operational and that R1 was successfully providing Layer 3 connectivity between the VLANs.
+
+DHCP was also functioning correctly, allowing client devices to obtain IPv4 addresses automatically.
+
+The baseline network therefore permits communication between the different departmental networks.
+
+This represents the **unsecured state** of the network.
+
+### 5.4 Security Observation
+
+Although VLANs provide logical segmentation and separate broadcast domains, the baseline configuration does not sufficiently restrict communication between the departments.
+
+For example, a device in the Guest VLAN can currently communicate with devices in the Admin VLAN when permitted by the routing configuration.
+
+This is a security concern because different departments have different levels of trust and different access requirements.
+
+The next stage of the project will therefore introduce security controls to enforce the organisation's intended communication policy.
+
+### 5.5 Baseline Status
+
+**Baseline network: OPERATIONAL**
+
+The following functionality was verified:
+
+* VLAN segmentation
+* DHCP
+* 802.1Q trunking
+* Router-on-a-Stick
+* Inter-VLAN routing
+* Internal server connectivity
+* Cross-VLAN communication
+
 
