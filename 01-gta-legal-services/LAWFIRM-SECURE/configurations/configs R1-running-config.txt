@@ -42,7 +42,7 @@ no ipv6 cef
 !
 !
 !
-username admin privilege 15 secret 5 $1$mERr$p3yntkhz32GRyfsebTAnj/
+username admin privilege 15 secret 5 LawFirmAdmin123
 !
 !
 license udi pid CISCO2911/K9 sn FTX1524JC9F-
