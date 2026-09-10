@@ -478,3 +478,81 @@ Before the ACL was implemented, Finance hosts could communicate with all routed 
 After implementation, traffic originating from the Finance network is filtered by R1 before being forwarded to the other departmental VLANs.
 
 This demonstrates the transition from basic VLAN segmentation to **policy-based Layer 3 access control**.
+
+## 9. Final Security Verification
+
+After implementing the ACLs, end-to-end connectivity testing was performed to verify that the network behaved according to the defined security policy.
+
+### 9.1 Security Verification Matrix
+
+| Source VLAN | Destination | Expected | Result |
+| ----------- | ----------- | -------- | ------ |
+| ADMIN       | LAWYERS     | ALLOW    | PASS   |
+| ADMIN       | FINANCE     | ALLOW    | PASS   |
+| ADMIN       | GUEST       | ALLOW    | PASS   |
+| ADMIN       | SERVER      | ALLOW    | PASS   |
+| LAWYERS     | ADMIN       | ALLOW    | PASS   |
+| LAWYERS     | FINANCE     | ALLOW    | PASS   |
+| LAWYERS     | GUEST       | DENY     | PASS   |
+| FINANCE     | ADMIN       | DENY     | PASS   |
+| FINANCE     | LAWYERS     | DENY     | PASS   |
+| FINANCE     | GUEST       | DENY     | PASS   |
+| GUEST       | ADMIN       | DENY     | PASS   |
+| GUEST       | LAWYERS     | DENY     | PASS   |
+| GUEST       | FINANCE     | DENY     | PASS   |
+| GUEST       | SERVER      | DENY     | PASS   |
+
+### 9.2 Gateway Verification
+
+Each VLAN was also verified against its default gateway:
+
+* VLAN 10 ADMIN → `192.168.10.1` — PASS
+* VLAN 20 LAWYERS → `192.168.20.1` — PASS
+* VLAN 30 FINANCE → `192.168.30.1` — PASS
+* VLAN 40 GUEST → `192.168.40.1` — PASS
+
+This confirmed that the ACL implementation restricted unauthorized inter-VLAN communication without preventing hosts from reaching their own Layer 3 gateway.
+
+### 9.3 Final Security Result
+
+The network successfully transitioned from an unrestricted routed VLAN environment to a policy-controlled network.
+
+**Baseline:**
+
+```text
+VLAN Segmentation
+        ↓
+Inter-VLAN Routing
+        ↓
+Unrestricted Communication
+```
+
+**Secured:**
+
+```text
+VLAN Segmentation
+        ↓
+Inter-VLAN Routing
+        ↓
+ACL Enforcement
+        ↓
+Controlled Communication
+```
+
+The final verification confirms that the implemented ACLs enforce the defined access-control policy.
+
+**Final ACL Security Status: OPERATIONAL**
+
+### 9.4 Security Controls Implemented
+
+The following Layer 3 security controls are now implemented:
+
+* Extended ACL for Guest restrictions
+* Extended ACL for Lawyers restrictions
+* Extended ACL for Finance restrictions
+* Inbound ACL application on the appropriate router subinterfaces
+* Least-privilege-based inter-VLAN access control
+* End-to-end security verification
+
+The lab now provides a functional example of how **VLAN segmentation, Layer 3 routing, and ACL-based access control** can be combined to enforce network security policy.
+
