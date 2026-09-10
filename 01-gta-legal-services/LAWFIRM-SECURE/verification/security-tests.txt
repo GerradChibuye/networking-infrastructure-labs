@@ -1,1 +1,47 @@
+LAWFIRM-SECURE — SECURITY VERIFICATION
 
+ADMIN
+→ LAWYERS: PASS
+→ FINANCE: PASS
+→ GUEST: PASS
+→ SERVER: PASS
+→ R1 SSH: PASS
+
+LAWYERS
+→ ADMIN: PASS
+→ FINANCE: PASS
+→ GUEST: DENIED
+→ R1 SSH: DENIED
+
+FINANCE
+→ ADMIN: DENIED
+→ LAWYERS: DENIED
+→ GUEST: DENIED
+→ R1 SSH: DENIED
+
+GUEST
+→ ADMIN: DENIED
+→ LAWYERS: DENIED
+→ FINANCE: DENIED
+→ SERVER: DENIED
+→ R1 SSH: DENIED
+
+LAYER 2 SECURITY
+
+ADMIN Fa0/1–Fa0/2: SecureSticky, maximum 1 MAC
+LAWYERS Fa0/3–Fa0/4: SecureSticky, maximum 1 MAC
+FINANCE Fa0/5–Fa0/6: SecureSticky, maximum 1 MAC
+
+Violation mode:
+Restrict
+
+UNUSED PORTS
+
+Fa0/9–Fa0/22: VLAN 999 + shutdown
+Gi0/1–Gi0/2: VLAN 999 + shutdown
+
+SSH
+
+SSH Version 2
+VTY access restricted to ADMIN subnet
+Telnet disabled
