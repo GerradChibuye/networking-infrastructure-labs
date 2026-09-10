@@ -28,7 +28,6 @@ The objectives of this project are to:
 * Implement ACLs to control inter-VLAN communication.
 * Implement Layer 2 security using Port Security.
 * Secure unused switch interfaces.
-* Implement PortFast and BPDU Guard where appropriate.
 * Harden the network devices.
 * Test and verify the implemented security controls.
 * Compare the unsecured and secured network environments.
@@ -45,11 +44,9 @@ The objectives of this project are to:
 * Extended ACLs
 * SSH
 * Port Security
-* PortFast
-* BPDU Guard
 * Cisco device hardening
 
-  2. Network Topology
+## 2. Network Topology
 
 The following diagram represents the baseline unsecured network implemented in Cisco Packet Tracer.
 
@@ -96,7 +93,6 @@ VLAN segmentation creates separate broadcast domains for Administration, Lawyers
 At this stage, VLAN segmentation provides logical separation, but it does not by itself enforce the complete communication policy between departments.
 
 Inter-VLAN communication is handled by the router and will be controlled later using Layer 3 security mechanisms.
-
 
 ## 4. Inter-VLAN Routing and DHCP
 
@@ -257,7 +253,6 @@ The following functionality was verified:
 * Internal server connectivity
 * Cross-VLAN communication
 
-
 ## 6. Security Policy Definition
 
 Before implementing Access Control Lists (ACLs), a security policy was defined to determine which VLANs should be permitted or denied communication with one another.
@@ -369,7 +364,7 @@ The ACL was applied inbound on the VLAN 40 router subinterface:
 
 ```cisco
 interface g0/0.40
- ip access-group GUEST-RESTRICTIONS in
+ ip access-group GUEST_RESTRICTIONS in
 ```
 
 ### 7.3 Configuration Rationale
@@ -411,7 +406,6 @@ This confirms that the ACL is actively enforcing the security policy.
 `Guest → Router → ACL → DENIED`
 
 The implementation demonstrates the difference between network segmentation and access control: VLAN 40 remains a separate network, while the ACL now determines what traffic originating from that network is permitted to reach.
-
 
 ## 8. Finance Network Access Control
 
@@ -555,4 +549,3 @@ The following Layer 3 security controls are now implemented:
 * End-to-end security verification
 
 The lab now provides a functional example of how **VLAN segmentation, Layer 3 routing, and ACL-based access control** can be combined to enforce network security policy.
-
