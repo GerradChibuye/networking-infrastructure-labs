@@ -9,7 +9,7 @@ hostname R1
 !
 !
 !
-enable secret 5 $1$mERr$Kog/HWDTou5jMSh/XdPqN.
+enable secret 5 <REDACTED>
 !
 !
 ip dhcp excluded-address 192.168.10.1 192.168.10.20
