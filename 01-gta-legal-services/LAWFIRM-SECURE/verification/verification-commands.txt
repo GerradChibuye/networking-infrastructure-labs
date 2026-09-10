@@ -1,1 +1,21 @@
+LAWFIRM-SECURE — VERIFICATION COMMANDS
 
+ROUTER
+
+show ip interface brief
+show running-config | section interface GigabitEthernet0/0
+show ip dhcp binding
+show ip dhcp pool
+show access-lists
+show running-config | section line vty
+show ip ssh
+
+SWITCH
+
+show vlan brief
+show interfaces trunk
+show interfaces fa0/23 switchport
+show port-security
+show port-security address
+show interfaces status
+show running-config
