@@ -1,1 +1,36 @@
+LAWFIRM-UNSECURE — BASELINE CONNECTIVITY TESTS
 
+Purpose:
+Demonstrate that the original network permitted unrestricted inter-VLAN communication before security controls were implemented.
+
+Tests:
+
+ADMIN → ADMIN GATEWAY
+Result: PASS
+
+ADMIN → LAWYERS
+Result: PASS
+
+ADMIN → FINANCE
+Result: PASS
+
+ADMIN → GUEST
+Result: PASS
+
+ADMIN → SERVER
+Result: PASS
+
+LAWYERS → ADMIN
+Result: PASS
+
+FINANCE → ADMIN
+Result: PASS
+
+GUEST → ADMIN
+Result: PASS
+
+Observation:
+The VLANs successfully separated broadcast domains, but Router-on-a-Stick allowed communication between VLANs because no ACL restrictions were configured.
+
+Security finding:
+Guest and Finance networks could reach internal networks before ACL enforcement.
