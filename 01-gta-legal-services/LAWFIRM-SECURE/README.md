@@ -244,6 +244,7 @@ Three violation modes were investigated:
 | Shutdown | Dropped              | Err-disabled | Yes                |
 
 `restrict` was selected because it provides a balance between security and availability. Unauthorized traffic is blocked and violations are recorded without automatically disabling the entire switch port.
+see linkedin post here: https://www.linkedin.com/posts/gerrad-chibuye-a9298b256_networking-cybersecurity-cisco-activity-7503758906763161601-Gm1o
 
 The behavior was experimentally verified by connecting an unauthorized device to a protected port.
 
