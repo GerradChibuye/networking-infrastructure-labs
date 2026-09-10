@@ -258,3 +258,223 @@ The following functionality was verified:
 * Cross-VLAN communication
 
 
+## 6. Security Policy Definition
+
+Before implementing Access Control Lists (ACLs), a security policy was defined to determine which VLANs should be permitted or denied communication with one another.
+
+The objective was to move beyond basic VLAN segmentation and establish controlled communication based on the responsibilities of each department.
+
+### 6.1 Security Objectives
+
+The security policy follows the principle of least privilege:
+
+* Administration requires broad access to the organization's internal network and server.
+* Lawyers require access to Administration and Finance but should not access the Guest network.
+* Finance should not initiate communication with other departmental networks.
+* Guests should not access internal departmental networks or the internal server.
+
+### 6.2 Access Control Matrix
+
+| Source VLAN | Destination | Action |
+| ----------- | ----------- | ------ |
+| ADMIN       | LAWYERS     | ALLOW  |
+| ADMIN       | FINANCE     | ALLOW  |
+| ADMIN       | GUEST       | ALLOW  |
+| ADMIN       | SERVER      | ALLOW  |
+| LAWYERS     | ADMIN       | ALLOW  |
+| LAWYERS     | FINANCE     | ALLOW  |
+| LAWYERS     | GUEST       | DENY   |
+| FINANCE     | ADMIN       | DENY   |
+| FINANCE     | LAWYERS     | DENY   |
+| FINANCE     | GUEST       | DENY   |
+| GUEST       | ADMIN       | DENY   |
+| GUEST       | LAWYERS     | DENY   |
+| GUEST       | FINANCE     | DENY   |
+| GUEST       | SERVER      | DENY   |
+
+### 6.3 Policy Rationale
+
+VLANs provide logical network segmentation, but segmentation alone does not determine which networks are allowed to communicate.
+
+Because Router-on-a-Stick provides Layer 3 connectivity between the VLANs, traffic can currently travel between departments unless additional access controls are applied.
+
+ACLs will therefore be used to enforce the defined security policy.
+
+The intended security model is:
+
+**VLANs → provide segmentation**
+
+**Router-on-a-Stick → provides inter-VLAN connectivity**
+
+**ACLs → control permitted and denied traffic**
+
+This approach allows necessary business communication while restricting unnecessary or unauthorized access.
+
+### 6.4 Baseline vs. Secured State
+
+The current `LAWFIRM-UNSECURE` network intentionally has no ACL-based traffic restrictions. This provides a baseline against which the secured implementation can later be tested.
+
+For example, in the baseline state, a Guest device can communicate with an Administration device because:
+
+1. The devices belong to different VLANs.
+2. R1 provides routing between VLAN 40 and VLAN 10.
+3. No ACL currently denies the traffic.
+
+The secured version of the lab will introduce ACLs to enforce the access control matrix defined above.
+
+### 6.5 Security Transformation
+
+The project therefore follows this progression:
+
+**Initial state**
+
+`VLAN Segmentation → Inter-VLAN Routing → unrestricted communication`
+
+**Secured state**
+
+`VLAN Segmentation → Inter-VLAN Routing → ACL Enforcement → controlled communication`
+
+The purpose of the secure implementation is not to eliminate all inter-VLAN communication, but to ensure that communication occurs according to the organization's defined security requirements.
+
+## 7. Guest Network Access Control
+
+The first security control implemented was an Extended ACL restricting traffic originating from the Guest VLAN.
+
+### 7.1 Security Requirement
+
+Guest users must not be able to access:
+
+* Administration
+* Lawyers
+* Finance
+* Internal servers
+
+The Guest network is:
+
+`192.168.40.0/24`
+
+### 7.2 ACL Configuration
+
+An Extended ACL named `GUEST_RESTRICTIONS` was created on R1.
+
+```cisco
+ip access-list extended GUEST_RESTRICTIONS
+ deny ip 192.168.40.0 0.0.0.255 192.168.10.0 0.0.0.255
+ deny ip 192.168.40.0 0.0.0.255 192.168.20.0 0.0.0.255
+ deny ip 192.168.40.0 0.0.0.255 192.168.30.0 0.0.0.255
+ permit ip any any
+```
+
+The ACL was applied inbound on the VLAN 40 router subinterface:
+
+```cisco
+interface g0/0.40
+ ip access-group GUEST-RESTRICTIONS in
+```
+
+### 7.3 Configuration Rationale
+
+The ACL is applied **inbound** on `G0/0.40` because this is the Layer 3 interface through which traffic originating from the Guest VLAN enters the router.
+
+This allows R1 to inspect Guest-originated traffic before routing it toward another VLAN.
+
+The three deny statements prevent Guest traffic from reaching the three internal departmental networks.
+
+The final `permit ip any any` allows other traffic not matching those restrictions to continue. This also prevents the ACL's implicit deny from unnecessarily blocking all remaining Guest traffic.
+
+### 7.4 Verification
+
+The following connectivity tests were performed from a Guest device:
+
+| Test                    | Result      |
+| ----------------------- | ----------- |
+| Guest → Admin           | **BLOCKED** |
+| Guest → Lawyers         | **BLOCKED** |
+| Guest → Finance         | **BLOCKED** |
+| Guest → Internal Server | **BLOCKED** |
+| Guest → VLAN 40 Gateway | **PASS**    |
+
+### 7.5 Result
+
+The Guest network is now restricted from accessing the organization's internal departmental networks and server.
+
+This confirms that the ACL is actively enforcing the security policy.
+
+### 7.6 Security Improvement
+
+**Before ACL:**
+
+`Guest → Router → Internal VLAN → ALLOWED`
+
+**After ACL:**
+
+`Guest → Router → ACL → DENIED`
+
+The implementation demonstrates the difference between network segmentation and access control: VLAN 40 remains a separate network, while the ACL now determines what traffic originating from that network is permitted to reach.
+
+
+## 8. Finance Network Access Control
+
+### 8.1 Security Requirement
+
+The Finance VLAN should not initiate communication with other departmental networks.
+
+The following traffic originating from VLAN 30 must be denied:
+
+* Finance → Administration
+* Finance → Lawyers
+* Finance → Guest
+
+Finance must still be able to communicate with its own default gateway.
+
+### 8.2 ACL Configuration
+
+An extended ACL named `FINANCE_RESTRICTIONS` was created on R1:
+
+```cisco
+ip access-list extended FINANCE_RESTRICTIONS
+ deny ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+ deny ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+ deny ip 192.168.30.0 0.0.0.255 192.168.40.0 0.0.0.255
+ permit ip any any
+```
+
+The ACL was applied inbound to the Finance subinterface:
+
+```cisco
+interface g0/0.30
+ ip access-group FINANCE_RESTRICTIONS in
+```
+
+### 8.3 Rationale
+
+The ACL filters traffic entering the router from the Finance VLAN.
+
+Because the ACL is applied inbound on `G0/0.30`, traffic originating from `192.168.30.0/24` is inspected before the router forwards it toward another VLAN.
+
+The `permit ip any any` statement allows traffic that does not match the three deny statements to continue through the router.
+
+### 8.4 Verification
+
+The following tests were performed:
+
+| Test                      | Expected Result | Result |
+| ------------------------- | --------------- | ------ |
+| Finance → Admin           | DENY            | PASS   |
+| Finance → Lawyers         | DENY            | PASS   |
+| Finance → Guest           | DENY            | PASS   |
+| Finance → Finance Gateway | ALLOW           | PASS   |
+
+### 8.5 Result
+
+The Finance VLAN's outbound access to the other departmental networks is now restricted according to the defined security policy.
+
+**Status: SECURED**
+
+### 8.6 Security Improvement
+
+Before the ACL was implemented, Finance hosts could communicate with all routed VLANs.
+
+After implementation, traffic originating from the Finance network is filtered by R1 before being forwarded to the other departmental VLANs.
+
+This demonstrates the transition from basic VLAN segmentation to **policy-based Layer 3 access control**.
